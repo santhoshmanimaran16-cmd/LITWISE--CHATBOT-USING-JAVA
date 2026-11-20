@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LitWise</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{--bg:#EDF0F5;--surface:#fff;--ink:#16213A;--ink2:#586277;--line:#DAE0EA;--mark:#FFE14D;--teal:#0E7C6B;--red:#B3261E;
+--head:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;--body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:var(--ink);color:#E8ECF6;padding:28px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.brand{font:700 26px var(--head);letter-spacing:-.02em;padding:0 10px}
+.brand span{color:#fff;background:linear-gradient(transparent 62%,rgba(255,225,77,.85) 62% 90%,transparent 90%)}
+.sub{font-size:13px;color:#A9B3CC;padding:6px 10px 26px;max-width:200px}
+nav{display:flex;flex-direction:column;gap:4px}
+nav button{display:flex;justify-content:space-between;align-items:center;background:none;border:0;color:#C9D1E6;text-align:left;padding:11px 12px;border-radius:8px;cursor:pointer;transition:background .15s}
+nav button:hover{background:rgba(255,255,255,.08)}
+nav button.on{background:var(--mark);color:var(--ink);font-weight:600}
+nav .n{font-size:12px;min-width:22px;text-align:center;padding:1px 7px;border-radius:99px;background:rgba(255,255,255,.14)}
+nav button.on .n{background:rgba(22,33,58,.14)}
+.foot{margin-top:auto;font-size:12.5px;color:#8F9AB8;padding:0 10px}
+main{padding:40px min(5vw,56px) 80px;max-width:1080px;width:100%}
+.pane{display:none}.pane.on{display:block;animation:in .25s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font:700 34px/1.15 var(--head);letter-spacing:-.02em;margin:0 0 8px}
+.lead{color:var(--ink2);max-width:60ch;margin:0 0 28px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.stack{display:grid;gap:14px}
+label{display:block;font-weight:600;font-size:13.5px;margin:0 0 6px}
+input[type=text]{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#FBFCFE;transition:border-color .15s}
+input[type=text]:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px var(--mark)}
+.row{display:flex;gap:10px;align-items:flex-end}.row>div{flex:1}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn{background:var(--ink);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-weight:600;cursor:pointer;white-space:nowrap;transition:transform .1s,background .15s}
+.btn:hover{background:#2A3960}.btn:active{transform:scale(.97)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn.ghost{background:none;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{background:#F2F4F9;border-color:var(--ink2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center;color:var(--ink2);font-size:13px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--ink);background:var(--mark)}
+.tag{display:inline-block;background:#EEF1F7;border-radius:6px;padding:2px 8px;font-size:12.5px;color:var(--ink2);margin:2px 4px 2px 0}
+.topic{display:grid;gap:8px;margin-top:14px;border-left:5px solid var(--mark)}
+.topic h3{font:600 18px/1.3 var(--head);margin:0}.topic p{margin:0;color:var(--ink2)}
+.topic .q{color:var(--ink);font-size:16px}
+.drop{border:2px dashed #B7C0D3;border-radius:14px;background:var(--surface);padding:34px 20px;text-align:center;cursor:pointer;transition:all .15s}
+.drop:hover,.drop.over{border-color:var(--ink);background:#FFFBE0}
+.drop b{font:600 18px var(--head);display:block;margin-bottom:4px}
+.drop span{color:var(--ink2);font-size:13.5px}
+.paper{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-top:12px;padding:16px 20px}
+.paper h3{font:600 15.5px var(--body);margin:0 0 6px;word-break:break-word}
+.seg{display:flex;gap:3px;margin-bottom:5px;width:150px}.seg i{height:6px;flex:1;border-radius:3px;background:var(--line)}.seg i.f{background:var(--teal)}
+.paper small{color:var(--ink2);font-size:12.5px}
+.tbl{overflow:auto;border-radius:14px;border:1px solid var(--line);background:var(--surface);max-height:70vh}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:640px;font-size:13.5px}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);border-right:1px solid var(--line);min-width:220px}
+thead th{position:sticky;top:0;background:var(--ink);color:#fff;font:600 13.5px var(--body);z-index:2}
+tbody th{position:sticky;left:0;background:#F4F6FA;min-width:130px;z-index:1;font-weight:600}
+thead th:first-child{left:0;z-index:3;min-width:130px}
+td.miss{color:#9AA3B5;font-style:italic}
+tr:last-child th,tr:last-child td{border-bottom:0}th:last-child,td:last-child{border-right:0}
+.warn{background:#FFF8CC;border:1px solid #EBD64F;border-radius:10px;padding:10px 14px;font-size:13.5px;margin-bottom:14px}
+.gap h3{margin:0 0 6px;font:600 20px var(--head)}
+.gap mark{background:linear-gradient(transparent 40%,var(--mark) 40%);color:inherit;padding:0 3px}
+.bar{height:8px;background:var(--line);border-radius:4px;margin:10px 0;overflow:hidden}.bar i{display:block;height:100%;background:var(--ink);border-radius:4px}
+.gap{margin-bottom:14px}
+.cite{position:relative;margin-top:0}
+.cite h3{margin:0 0 8px;font:600 15px var(--body)}
+.cite p{margin:0 0 12px;font-size:16px;line-height:1.6;background:#F4F6FA;padding:14px 16px;border-radius:10px;min-height:56px;white-space:pre-wrap;font-family:Georgia,'Times New Roman',serif}
+.empty{text-align:center;padding:38px 16px;color:var(--ink2)}
+.empty b{display:block;color:var(--ink);font:600 18px var(--head);margin-bottom:6px}
+.empty .btn{margin-top:14px}
+#toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:all .2s;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:820px){
+ .app{grid-template-columns:1fr}
+ aside{position:static;height:auto;padding:16px 12px}.sub,.foot{display:none}.brand{padding:0 6px 10px}
+ nav{flex-direction:row;overflow-x:auto}nav button{white-space:nowrap;gap:8px}
+ .cols{grid-template-columns:1fr}.row{flex-direction:column;align-items:stretch}
+ main{padding:24px 16px 60px}h1{font-size:28px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand">Lit<span>Wise</span></div>
+  <div class="sub">From a broad idea to a literature review and a research gap.</div>
+  <nav id="nav">
+    <button data-p="topic" class="on">Find a topic</button>
+    <button data-p="papers">Papers <span class="n" id="cPapers">0</span></button>
+    <button data-p="matrix">Review matrix</button>
+    <button data-p="gaps">Research gaps</button>
+    <button data-p="cite">Citations</button>
+  </nav>
+  <div class="foot">Papers are kept in memory and clear when you stop the server.</div>
+</aside>
+
+<main>
+<section class="pane on" id="topic">
+  <h1>Narrow your research area</h1>
+  <p class="lead">Type a broad field and get three focused angles, each with a starter research question.</p>
+  <div class="box">
+    <label for="area">Broad research area</label>
+    <div class="row">
+      <div><input type="text" id="area" placeholder="e.g. accessible route planning for wheelchair users"></div>
+      <button class="btn" id="goTopic">Suggest topics</button>
+    </div>
+    <div class="chips">Try:
+      <button class="chip">low-resource machine translation</button>
+      <button class="chip">federated learning in healthcare</button>
+      <button class="chip">crop disease detection</button>
+    </div>
+  </div>
+  <div id="topicOut"></div>
+</section>
+
+<section class="pane" id="papers">
+  <h1>Upload research papers</h1>
+  <p class="lead">Add PDFs and LitWise pulls out the objective, method, dataset, findings, limitations and future scope. It matches keywords, so check each result against the paper.</p>
+  <label class="drop" id="drop" for="pdf" style="display:block">
+    <b>Drop PDFs here or click to choose</b>
+    <span id="status">You can select several files at once.</span>
+  </label>
+  <input type="file" id="pdf" accept="application/pdf" multiple hidden>
+  <div id="paperList"></div>
+</section>
+
+<section class="pane" id="matrix">
+  <h1>Literature review matrix</h1>
+  <p class="lead">Every paper compared on the same six aspects. Scroll sideways when you have more papers than fit.</p>
+  <div id="matrixOut"></div>
+</section>
+
+<section class="pane" id="gaps">
+  <h1>Suggested research gaps</h1>
+  <p class="lead">Terms that show up in the limitations of more than one paper. A recurring limitation can point to something nobody has solved yet.</p>
+  <div id="gapOut"></div>
+</section>
+
+<section class="pane" id="cite">
+  <h1>Citation generator</h1>
+  <p class="lead">Fill in the details and both formats update as you type.</p>
+  <div class="cols" style="align-items:start">
+    <div class="box stack">
+      <div><label for="cA">Authors</label><input type="text" id="cA" placeholder="Smith, J., Rao, K."></div>
+      <div><label for="cT">Title</label><input type="text" id="cT" placeholder="Paper title"></div>
+      <div><label for="cJ">Journal or conference</label><input type="text" id="cJ" placeholder="Journal name"></div>
+      <div class="cols">
+        <div><label for="cV">Volume and pages</label><input type="text" id="cV" placeholder="vol. 12, pp. 1-9"></div>
+        <div><label for="cY">Year</label><input type="text" id="cY" placeholder="2025"></div>
+      </div>
+    </div>
+    <div class="stack" id="citeOut">
+      <div class="box empty"><b>Your citations appear here</b>Start typing on the left.</div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FIELDS = [['Objective','objective'],['Methodology','method'],['Dataset','dataset'],['Findings','findings'],['Limitations','limitations'],['Future scope','futureScope']];
+const found = (p,k) => p[k] && p[k] !== '—';
+let papers = [];
+
+async function api(url, opts){ const r = await fetch(url, opts); if(!r.ok) throw new Error('Server returned ' + r.status); return r.json(); }
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove('on'), 2200); }
+function copy(text){ navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard'), ()=>toast('Copy failed. Select the text and copy it.')); }
+
+function show(id){
+  $$('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.p===id));
+  $$('.pane').forEach(p=>p.classList.toggle('on', p.id===id));
+  if(id==='gaps') loadGaps();
+  window.scrollTo({top:0});
+}
+$('#nav').onclick = e => { const b = e.target.closest('button'); if(b) show(b.dataset.p); };
+
+/* ---------- topics ---------- */
+async function suggest(){
+  const area = $('#area').value.trim(), out = $('#topicOut');
+  if(!area){ toast('Enter a research area first'); $('#area').focus(); return; }
+  try{
+    const list = await api('/api/topics/suggest', {method:'POST', body:new URLSearchParams({area})});
+    out.innerHTML = list.map((t,i)=>`<div class="box topic"><h3>${esc(t.title)}</h3><p class="q">${esc(t.question)}</p>
+      <div><button class="btn ghost sm" data-copy="${i}">Copy question</button></div></div>`).join('');
+    out.onclick = e => { const b = e.target.closest('[data-copy]'); if(b) copy(list[b.dataset.copy].question); };
+  }catch(e){ toast('Could not reach the Java server. Is it running?'); }
+}
+$('#goTopic').onclick = suggest;
+$('#area').onkeydown = e => { if(e.key==='Enter') suggest(); };
+$$('.chip').forEach(c => c.onclick = () => { $('#area').value = c.textContent; suggest(); });
+
+/* ---------- papers ---------- */
+async function readPdf(file){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const pdf = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
+  let text = '';
+  for(let i=1;i<=pdf.numPages;i++){
+    const c = await (await pdf.getPage(i)).getTextContent();
+    text += c.items.map(x=>x.str).join(' ') + '\n';
+  }
+  return text;
+}
+async function upload(files){
+  const list = [...files].filter(f=>/\.pdf$/i.test(f.name));
+  if(!list.length){ toast('Only PDF files are supported'); return; }
+  for(const [i,f] of list.entries()){
+    $('#status').textContent = `Reading ${f.name} (${i+1} of ${list.length})…`;
+    try{
+      const text = await readPdf(f);
+      await api('/api/papers', {method:'POST', body:new URLSearchParams({name:f.name, text})});
+    }catch(e){ toast(`Could not read ${f.name}: ${e.message}`); }
+  }
+  $('#status').textContent = 'Done. Drop more PDFs to add them.';
+  await refresh();
+  toast(list.length > 1 ? `${list.length} papers added` : 'Paper added');
+}
+const drop = $('#drop');
+$('#pdf').onchange = e => { upload(e.target.files); e.target.value = ''; };
+['dragenter','dragover'].forEach(v=>drop.addEventListener(v, e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(v=>drop.addEventListener(v, e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop', e => upload(e.dataTransfer.files));
+
+async function refresh(){
+  papers = await api('/api/papers');
+  $('#cPapers').textContent = papers.length;
+  renderPapers(); renderMatrix();
+}
+function renderPapers(){
+  $('#paperList').innerHTML = papers.map(p=>{
+    const n = FIELDS.filter(([,k])=>found(p,k)).length;
+    return `<div class="box paper"><div><h3>${esc(p.name)}</h3>
+      <div class="seg" title="${n} of 6 sections found">${FIELDS.map(([,k])=>`<i class="${found(p,k)?'f':''}"></i>`).join('')}</div>
+      <small>${n} of 6 sections found</small></div>
+      <button class="btn ghost sm" data-rm="${p.id}">Remove</button></div>`;
+  }).join('');
+}
+$('#paperList').onclick = async e => {
+  const b = e.target.closest('[data-rm]'); if(!b) return;
+  await api('/api/papers/' + b.dataset.rm, {method:'DELETE'}); refresh(); toast('Paper removed');
+};
+
+/* ---------- matrix ---------- */
+function emptyState(el, title, text){
+  el.innerHTML = `<div class="box empty"><b>${title}</b>${text}<br><button class="btn" data-go="papers">Upload papers</button></div>`;
+}
+function renderMatrix(){
+  const el = $('#matrixOut');
+  if(!papers.length) return emptyState(el, 'No papers yet', 'Upload a few PDFs and they will be compared here.');
+  el.innerHTML = `<div class="tbl"><table><thead><tr><th>Aspect</th>${papers.map(p=>`<th>${esc(p.name)}</th>`).join('')}</tr></thead><tbody>` +
+    FIELDS.map(([l,k])=>`<tr><th>${l}</th>${papers.map(p=>found(p,k)?`<td>${esc(p[k])}</td>`:'<td class="miss">Not found in this paper</td>').join('')}</tr>`).join('') +
+    '</tbody></table></div>';
+}
+
+/* ---------- gaps ---------- */
+async function loadGaps(){
+  const el = $('#gapOut');
+  if(papers.length < 2) return emptyState(el, 'Add at least two papers', 'Gaps come from limitations that repeat across papers.');
+  try{
+    const gaps = await api('/api/papers/gaps');
+    const warn = '<div class="warn">These are leads from keyword matching, not confirmed gaps. Read the source papers before you rely on them.</div>';
+    if(!gaps.length){ el.innerHTML = warn + '<div class="box empty"><b>No repeated limitations found</b>Your papers do not share limitation terms yet. Try adding more.</div>'; return; }
+    el.innerHTML = warn + gaps.map(g=>`<div class="box gap"><h3><mark>${esc(g.term)}</mark></h3>
+      <div>Named as a limitation in ${g.count} of ${papers.length} papers.</div>
+      <div class="bar"><i style="width:${Math.round(g.count/papers.length*100)}%"></i></div>
+      <div>${g.sources.map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div></div>`).join('');
+  }catch(e){ toast('Could not load gaps'); }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if(b) show(b.dataset.go); });
+
+/* ---------- citations ---------- */
+let ct;
+['cA','cT','cJ','cV','cY'].forEach(id => $('#'+id).oninput = () => { clearTimeout(ct); ct = setTimeout(cite, 200); });
+async function cite(){
+  const v = { authors:$('#cA').value, title:$('#cT').value, journal:$('#cJ').value, volume:$('#cV').value, year:$('#cY').value };
+  const out = $('#citeOut');
+  if(!Object.values(v).some(x=>x.trim())){ out.innerHTML = '<div class="box empty"><b>Your citations appear here</b>Start typing on the left.</div>'; return; }
+  try{
+    const c = await api('/api/citations/generate', {method:'POST', body:new URLSearchParams(v)});
+    out.innerHTML = [['IEEE',c.ieee],['APA',c.apa]].map(([n,t])=>`<div class="box cite"><h3>${n}</h3><p>${esc(t)}</p>
+      <button class="btn ghost sm" data-c="${n}">Copy ${n}</button></div>`).join('');
+    out.onclick = e => { const b = e.target.closest('[data-c]'); if(b) copy(b.dataset.c==='IEEE'?c.ieee:c.apa); };
+  }catch(e){ toast('Could not reach the Java server. Is it running?'); }
+}
+
+refresh().catch(()=>toast('Could not reach the Java server. Is it running?'));
+</script>
+</body>
+</html>
